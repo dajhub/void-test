@@ -72,7 +72,7 @@ sudo xbps-install -y \
 
 # 2d. Browser
 echo "--> Browser"
-sudo xbps-install -y vivladi
+sudo xbps-install -y firefox
 
 # Configure Shell
 echo "--> Configuring Shell"
@@ -87,9 +87,9 @@ if [ ! -L /var/service/dbus ]; then
 fi
 
 # Enable elogind (Required for clean session management)
-if [ ! -L /var/service/elogind ]; then
-  sudo ln -s /etc/sv/elogind /var/service/
-fi
+#if [ ! -L /var/service/elogind ]; then
+#  sudo ln -s /etc/sv/elogind /var/service/
+#fi
 
 # Enable seatd (Handles graphics/input permissions)
 if [ ! -L /var/service/seatd ]; then
