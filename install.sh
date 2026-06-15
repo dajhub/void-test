@@ -16,17 +16,70 @@ sudo xbps-install -y \
   xorg-minimal \
   i3-gaps \
   polybar \
+  picom \
+  autotiling \
+  betterlockscreen \
+  rofi \
+  dunst \
+  feh \
   sddm \
   seatd \
   dbus \
   elogind \
   polkit \
-  Alacritty \
+  alacritty \
   libX11-devel \
   libXft-devel \
   libXinerama-devel
 
-# 3. Configure runit services
+# 2a. Terminal & Editors
+echo "--> Installing terminal and editors"
+sudo xbps-install -y \
+  kitty \
+  zsh \
+  micro \
+  neovim
+
+# 2b. Utilities
+echo "--> Utilities"
+sudo xbps-install -y \
+  curl \
+  unzip \
+  base-devel \
+  xrandr \
+  xset \
+  htop \
+  bzmenu \
+  rsync \
+  xclip \
+  maim
+
+# 2c. File manager
+echo "--> File Manager"
+sudo xbps-install -y \
+  yazi \
+  ffmpeg \
+  7zip \
+  jq \
+  poppler \
+  fd \
+  ripgrep \
+  fzf \
+  zoxide \
+  resvg \
+  ImageMagick \
+  unzip
+
+# 2d. Browser
+echo "--> Browser"
+sudo xbps-install -y vivladi
+
+# Configure Shell
+echo "--> Configuring Shell"
+bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
+chsh -s /usr/bin/zsh
+
+# Configure runit services
 echo "--> Enabling core system services..."
 # Enable dbus (Required for elogind and SDDM)
 if [ ! -L /var/service/dbus ]; then
@@ -55,20 +108,37 @@ sudo gpasswd -a "$USER" video
 sudo gpasswd -a "$USER" audio
 sudo gpasswd -a "$USER" _seatd
 
-# 4. Create configuration directories for your dotfiles
+# 4. Configuring directories for dotfiles
 echo "--> Preparing config directories..."
-mkdir -p "$HOME/.config/i3"
-mkdir -p "$HOME/.config/polybar"
+
+CONFIG_DIR="$HOME/.config"
+DOTFILES_SRC="$HOME/i3"
+WALLPAPERS_DIR="$HOME/Pictures/Wallpapers"
+SCREENSHOTS_DIR="$HOME/Pictures/Screenshots"
+
+mkdir -p "$SCREENSHOTS_DIR"
+mkdir -p "$WALLPAPERS_DIR"
+mkdir -p "$CONFIG_DIR"
+mkdir -p "$SCREENSHOTS_DIR"
+
+if [ -d "$DOTFILES_SRC" ]; then
+  msg "Syncing dotfiles from $DOTFILES_SRC..."
+  if [ -f "$DOTFILES_SRC/folders.sh" ]; then
+    chmod +x "$DOTFILES_SRC/folders.sh"
+    (cd "$DOTFILES_SRC" && ./folders.sh)
+    msg "Folder sync complete."
+  else
+    warn "folders.sh not found in $DOTFILES_SRC."
+  fi
+else
+  warn "Source directory $DOTFILES_SRC not found! Skipping dotfiles."
+fi
 
 echo "========================================================="
 echo " Installation complete!"
 echo "========================================================="
-echo " Next steps:"
-echo " 1. Move your 'config' file into ~/.config/i3/"
-echo " 2. Move your Polybar configs into ~/.config/polybar/"
-echo " 3. Ensure your Polybar is configured to launch via i3"
-echo "    (e.g., 'exec_always --no-startup-id ~/.config/polybar/launch.sh')"
-echo " 4. REBOOT your system."
+echo "Next step:"
+echo "REBOOT system."
 echo "========================================================="
 echo " Note: On reboot, SDDM will start automatically."
 echo " Select 'i3' from the session dropdown menu before logging in!"

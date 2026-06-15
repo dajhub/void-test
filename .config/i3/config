@@ -1,0 +1,219 @@
+# i3wm Configuration
+
+# ----- MODIFIER KEY (Super/Windows) -----
+
+set $mod Mod4
+
+# ----- MONITOR DISPLAY -----
+exec --no-startup-id xrandr -s 1366x768
+
+# ----- GAPS -----
+gaps inner 3
+gaps outer 2
+
+# ----- APPLICATION VARIABLES -----
+set $TERMINAL kitty
+set $EDITOR vscodium
+set $BROWSER vivaldi
+
+# ----- BASIC KEYBIDINGS -----
+bindsym $mod+Return exec $TERMINAL
+bindsym $mod+b exec $BROWSER
+bindsym $mod+v exec $EDITOR
+
+bindsym $mod+space exec --no-startup-id rofi -config ~/.config/i3/rofi/config.rasi -show drun  # Application launcher
+bindsym $mod+w exec --no-startup-id rofi -config ~/.config/i3/rofi/config.rasi -show window # Lists windows
+bindsym $mod+Shift+e exec --no-startup-id rofi -config ~/.config/i3/rofi/config.rasi -show filebrowser # Show menus
+
+bindsym $mod+Shift+r exec --no-startup-id ~/.config/i3/scripts/reload.sh # Reload
+
+bindsym $mod+Control+l exec --no-startup-id betterlockscreen -l dim
+bindsym $mod+Control+Delete exec --no-startup-id systemctl poweroff
+bindsym $mod+Control+r exec --no-startup-id systemctl reboot
+bindsym $mod+Delete exec --no-startup-id i3-msg exit
+
+# Workspace navigation (1-10)
+bindsym $mod+1 workspace number 1
+bindsym $mod+2 workspace number 2
+bindsym $mod+3 workspace number 3
+bindsym $mod+4 workspace number 4
+bindsym $mod+5 workspace number 5
+bindsym $mod+6 workspace number 6
+bindsym $mod+7 workspace number 7
+bindsym $mod+8 workspace number 8
+bindsym $mod+9 workspace number 9
+bindsym $mod+0 workspace number 10
+
+# ----- WINDOW MANAGEMENT -----
+bindsym $mod+q kill
+
+bindsym $mod+c floating toggle
+
+bindsym $mod+g layout toggle split # Toggle group layout
+bindsym $mod+f fullscreen toggle
+
+# Focus navigation
+bindsym $mod+Left focus left
+bindsym $mod+Right focus right
+bindsym $mod+Up focus up
+bindsym $mod+Down focus down
+
+# Move focused window
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+
+# Window resizing
+bindsym $mod+Shift+Right resize grow width 30px
+bindsym $mod+Shift+Left resize shrink width 30px
+bindsym $mod+Shift+Up resize shrink height 30px
+bindsym $mod+Shift+Down resize grow height 30px
+
+floating_modifier Mod4
+
+# Mouse controls
+bindsym $mod+button1 move window
+bindsym $mod+button3 resize window
+
+# ----- LAYOUT MODES -----
+bindsym $mod+t layout tabbed
+bindsym $mod+s layout stacking
+bindsym $mod+e layout toggle split
+
+# ----- HARDWARE CONTROLS -----
+# Audio
+bindsym XF86AudioMute exec pactl set-sink-volume @DEFAULT_SINK@ toggle
+bindsym XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5%
+bindsym XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5%
+
+# Media
+bindsym XF86AudioPlay exec playerctl play-pause
+bindsym XF86AudioPause exec playerctl play-pause
+bindsym XF86AudioNext exec playerctl next
+bindsym XF86AudioPrev exec playerctl previous
+
+# Brightness
+bindsym XF86MonBrightnessUp exec /usr/bin/brightnessctl set +10%
+bindsym XF86MonBrightnessDown exec /usr/bin/brightnessctl set 10%-
+
+# ----- SCREENSHOTS -----
+# Area selection to clipboard
+bindsym Shift+Print exec --no-startup-id sh -c 'maim -s | xclip -selection clipboard -t image/png && notify-send "Screenshot" "Copied to clipboard"'
+
+# Fullscreen to file
+bindsym Control+Print exec --no-startup-id sh -c 'maim ~/Pictures/Screenshots/$(date +%y%m%d_%Hh%Mm%Ss_screenshot.png) && notify-send "Screenshot" "Saved to ~/Pictures/Screenshots"'
+
+# Fullscreen to both file AND clipboard (using tee)
+bindsym $mod+Print exec --no-startup-id sh -c 'maim | tee ~/Pictures/Screenshots/$(date +%y%m%d_%Hh%Mm%Ss_screenshot.png) | xclip -selection clipboard -t image/png && notify-send "Screenshot" "Saved to ~/Pictures/Screenshots and Copied"'
+
+# Fullscreen to clipboard only
+bindsym Print exec --no-startup-id sh -c 'maim | xclip -selection clipboard -t image/png && notify-send "Screenshot" "Copied to clipboard"'
+
+# Area selection to file
+bindsym $mod+Shift+Print exec --no-startup-id sh -c 'maim -s ~/Pictures/Screenshots/$(date +%y%m%d_%Hh%Mm%Ss_screenshot.png) && notify-send "Screenshot" "Region saved to ~/Pictures/Screenshots"'
+
+
+# ----- WORKSPACE CONTROLS -----
+# Workspace management
+bindsym $mod+Shift+1 move container to workspace number 1
+bindsym $mod+Shift+2 move container to workspace number 2
+bindsym $mod+Shift+3 move container to workspace number 3
+bindsym $mod+Shift+4 move container to workspace number 4
+bindsym $mod+Shift+5 move container to workspace number 5
+bindsym $mod+Shift+6 move container to workspace number 6
+bindsym $mod+Shift+7 move container to workspace number 7
+bindsym $mod+Shift+8 move container to workspace number 8
+bindsym $mod+Shift+9 move container to workspace number 9
+bindsym $mod+Shift+0 move container to workspace number 10
+
+# switch between workspaces
+bindsym $mod+Tab workspace next
+bindsym $mod+grave workspace prev
+
+
+# ----- ACTIONS & DEFAULTS -----
+
+# Enable focus follows mouse
+focus_follows_mouse yes
+
+# Don't warp cursor when focusing (optional)
+mouse_warping none
+
+# Focus new windows when they appear
+focus_on_window_activation smart
+
+# Automatically focus windows when switching workspaces
+workspace_auto_back_and_forth no
+
+# ----- APPEARANCE -----
+
+# Disable borders entirely
+#for_window [class=".*"] title_format " "
+for_window [class=".*"] border pixel 0
+default_border pixel 2
+default_floating_border pixel 0
+
+# Font
+font pango:JetBrains Mono 8
+
+# Colors
+set $bg      #EAF6FA
+set $fg      #2D2F30
+set $accent  #747C80
+set $urgent  #A83A3A
+set $inactive_bg #CBD5D8
+set $inactive_border #A9B1B4
+set $black   #000000
+
+# Window Colors
+# Target                Border            Background        Text        Indicator     Child Border
+client.focused          $accent           $accent           $bg         $accent       $accent
+client.unfocused        $inactive_border  $inactive_bg      $fg         $inactive_bg  $inactive_bg
+client.focused_inactive $inactive_border  $inactive_bg      $fg         $inactive_bg  $inactive_bg
+client.urgent           $urgent           $urgent           $bg         $urgent       $urgent
+
+
+# ----- AUTOSTART -----
+
+# Polybar
+exec_always --no-startup-id sleep 1 && polybar --config=~/.config/i3/polybar/config.ini main 2>&1 | tee -a /tmp/polybar.log &
+
+# Picom
+exec_always --no-startup-id sleep 1 && picom --config ~/.config/i3/picom.conf
+
+# Wallpaper
+exec_always --no-startup-id sleep 1 && feh --bg-scale ~/.config/i3/wallpapers/warriorHorse.jpg
+#exec_always --no-startup-id nitrogen --set-scaled ~/.jotalea/assets/nullscapes.png
+
+# Keyboard layout
+exec --no-startup-id setxkbmap gb
+
+# Autotiling script
+# https://github.com/nwg-piotr/autotiling
+# yay -S autotiling (in AUR if using Arch)
+exec_always --no-startup-id autotiling
+
+# Start Dunst notification daemon
+exec_always --no-startup-id dunst
+
+# Timeout & Idling
+# Set the idle timeout to 5 minutes (300 seconds)
+exec --no-startup-id xset s 300 300
+# Let xss-lock handle the idle event and system sleep events
+exec --no-startup-id xss-lock --transfer-sleep-lock -- betterlockscreen -l dim
+
+
+# ----- FLOATNG -----
+# Make kitty floating
+for_window [class="kitty"] floating enable, resize set 640 400, move position center
+
+# Make pavucontrol smaller and floating when opened 
+for_window [class="pavucontrol"] floating enable, resize set 640 400
+
+# Make nm-connection-editor smaller and floating when opened 
+for_window [class="Nm-connection-editor"] floating enable, resize set 640 400
+
+
+
+
