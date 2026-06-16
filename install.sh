@@ -108,11 +108,6 @@ if [ ! -L /var/service/dbus ]; then
   sudo ln -s /etc/sv/dbus /var/service/
 fi
 
-# Enable elogind (Required for clean session management)
-if [ ! -L /var/service/elogind ]; then
-  sudo ln -s /etc/sv/elogind /var/service/
-fi
-
 # Enable seatd (Handles graphics/input permissions)
 if [ ! -L /var/service/seatd ]; then
   sudo ln -s /etc/sv/seatd /var/service/
