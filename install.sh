@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
-# Exit immediately if a command exits with a non-zero status
+# Exit immediately if an show-error
 set -e
+
+# Messages
+msg() { echo -e "--> \$1"; }
+warn() { echo -e "\033[0;33m[WARN] \033[0m\$1"; }
 
 echo "=== Starting Void Linux i3 + Polybar + SDDM Installation ==="
 
@@ -9,30 +13,52 @@ echo "=== Starting Void Linux i3 + Polybar + SDDM Installation ==="
 echo "--> Updating XBPS database..."
 sudo xbps-install -S
 
-# 2. Install base X11, i3, Polybar, SDDM, and essential utilities
-# Note: Since we are using SDDM, xinit/startx are no longer required.
-echo "--> Installing core packages..."
+# 2. Display Server & Graphics
+echo "--> Installing X11 Display Server & Graphics Drivers"
 sudo xbps-install -y \
   xorg-minimal \
-  i3-gaps \
+  xf86-video-intel \
+  mesa-dri
+
+# 2a. Window Manager & Desktop Environment
+echo "--> Installing Window Manager and Desktop Components"
+sudo xbps-install -y \
+  i3 \
   polybar \
   picom \
-  autotiling \
-  betterlockscreen \
-  rofi \
-  dunst \
-  feh \
+  autotiling
+
+# 2b. Display Manager & Session Management
+echo "--> Installing Session, Seat, and Login Management"
+sudo xbps-install -y \
   sddm \
   seatd \
   dbus \
   elogind \
-  polkit \
+  polkit
+
+# 2c. Desktop Utilities (Lockscreen, Launchers, Notifications)
+echo "--> Installing Desktop Utilities & X11 Utilities"
+sudo xbps-install -y \
+  betterlockscreen \
+  brightnessctl \
+  rofi \
+  dunst \
+  feh \
+  xset \
+  xrandr \
+  xclip \
   alacritty \
+  maim
+
+# 2d. X11 Development Headers (Optional but helpful for compilation)
+echo "--> Installing X11 Development Libraries"
+sudo xbps-install -y \
   libX11-devel \
   libXft-devel \
   libXinerama-devel
 
-# 2a. Terminal & Editors
+# 2e. Terminal & Editors
 echo "--> Installing terminal and editors"
 sudo xbps-install -y \
   kitty \
@@ -40,21 +66,17 @@ sudo xbps-install -y \
   micro \
   neovim
 
-# 2b. Utilities
-echo "--> Utilities"
+# 2f. Utilities
+echo "--> Installing System & CLI Utilities"
 sudo xbps-install -y \
   curl \
   unzip \
   base-devel \
-  xrandr \
-  xset \
   htop \
   bzmenu \
-  rsync \
-  xclip \
-  maim
+  rsync
 
-# 2c. File manager
+# 2g. File manager
 echo "--> File Manager"
 sudo xbps-install -y \
   yazi \
@@ -70,14 +92,14 @@ sudo xbps-install -y \
   ImageMagick \
   unzip
 
-# 2d. Browser
+# 2h. Browser
 echo "--> Browser"
 sudo xbps-install -y firefox
 
 # Configure Shell
 echo "--> Configuring Shell"
 bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
-chsh -s /usr/bin/zsh
+chsh -s /usr/bin/zsh "$USER"
 
 # Configure runit services
 echo "--> Enabling core system services..."
@@ -87,9 +109,9 @@ if [ ! -L /var/service/dbus ]; then
 fi
 
 # Enable elogind (Required for clean session management)
-#if [ ! -L /var/service/elogind ]; then
-#  sudo ln -s /etc/sv/elogind /var/service/
-#fi
+if [ ! -L /var/service/elogind ]; then
+  sudo ln -s /etc/sv/elogind /var/service/
+fi
 
 # Enable seatd (Handles graphics/input permissions)
 if [ ! -L /var/service/seatd ]; then
@@ -103,7 +125,7 @@ fi
 
 # Add current user to required groups
 echo "--> Adding user $USER to video, audio, and seat groups..."
-sudo umask 026
+#sudo umask 026
 sudo gpasswd -a "$USER" video
 sudo gpasswd -a "$USER" audio
 sudo gpasswd -a "$USER" _seatd
@@ -112,14 +134,13 @@ sudo gpasswd -a "$USER" _seatd
 echo "--> Preparing config directories..."
 
 CONFIG_DIR="$HOME/.config"
-DOTFILES_SRC="$HOME/i3"
+DOTFILES_SRC="$HOME/void-test"
 WALLPAPERS_DIR="$HOME/Pictures/Wallpapers"
 SCREENSHOTS_DIR="$HOME/Pictures/Screenshots"
 
 mkdir -p "$SCREENSHOTS_DIR"
 mkdir -p "$WALLPAPERS_DIR"
 mkdir -p "$CONFIG_DIR"
-mkdir -p "$SCREENSHOTS_DIR"
 
 if [ -d "$DOTFILES_SRC" ]; then
   msg "Syncing dotfiles from $DOTFILES_SRC..."
